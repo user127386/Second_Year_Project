@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediLens | Create Account</title>
+    <link rel="stylesheet" href="style_register.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>MediLens</h2>
+
+            <form id="registerForm">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="fullname" placeholder="For eg. Jane Doe" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" placeholder="name@email.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="Enter password" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="repeat_password" placeholder="Repeat password" required>
+                </div>
+
+                <button type="submit">Create Account</button>
+            </form>
+
+            <div id="message"></div>
+
+            <div class="footer-text">
+                Already have an account? <a href="login.html">Log In</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("registerForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const fullname = document.getElementById("fullname").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const repeatPassword = document.getElementById("repeat_password").value;
+            const messageDiv = document.getElementById("message");
+
+            if (password !== repeatPassword) {
+                messageDiv.className = "error";
+                messageDiv.innerText = "Passwords do not match.";
+                return;
+            }
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/api/auth/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ full_name: fullname, email: email, password: password})
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    messageDiv.className = "success";
+                    messageDiv.innerText = "Account created successfully! Redirecting to login...";
+                    setTimeout(() => {
+                        window.location.href = "login.html";
+                    }, 1500);
+                } else {
+                    messageDiv.className = "error";
+                    messageDiv.innerText = data.detail || "Registration failed.";
+                }
+            } catch (err) {
+                messageDiv.className = "error";
+                messageDiv.innerText = "Unable to reach the backend server.";
+            }
+        });
+    </script>
+</body>
+</html>
